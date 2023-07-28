@@ -117,9 +117,9 @@ app.delete("/usuarios/:id", async (req: Request, res: Response) => {
     try {
         const idToDelete = req.params.id
 
-        if (idToDelete[0] !== "f") {
+        if (idToDelete[0] !== "u") {
             res.status(400)
-            throw new Error("'id' deve iniciar com a letra 'f'")
+            throw new Error("'id' deve iniciar com a letra 'u'")
         }
 
         const [ usuarioIdAlreadyExists ]: UsarioTipo[] | undefined[] = await db("usuarios").where({ id: idToDelete })
@@ -148,7 +148,6 @@ app.delete("/usuarios/:id", async (req: Request, res: Response) => {
         }
     }
 })
-
 
 //Bloco tarefas
 app.get("/tarefas", async (req: Request, res: Response) => {
@@ -371,8 +370,6 @@ app.delete("/tarefas/:id", async (req: Request, res: Response) => {
     }
 })
 
-
-
 //Bloco tarefas atribuidas
 app.post("/tarefas/:tarefaId/usuarios/:usuarioId", async (req: Request, res: Response) => {
     try {
@@ -384,9 +381,9 @@ app.post("/tarefas/:tarefaId/usuarios/:usuarioId", async (req: Request, res: Res
             throw new Error("'tarefaId' deve iniciar com a letra 't'")
         }
 
-        if (usuarioId[0] !== "f") {
+        if (usuarioId[0] !== "u") {
             res.status(400)
-            throw new Error("'usuarioId' deve iniciar com a letra 'f'")
+            throw new Error("'usuarioId' deve iniciar com a letra 'u'")
         }
 
         const [ tarefa ]: TarefaTipo[] | undefined[] = await db("tarefas").where({ id: tarefaId })
@@ -436,9 +433,9 @@ app.delete("/tarefas/:tarefaId/usuarios/:usuarioId", async (req: Request, res: R
             throw new Error("'tarefaId' deve iniciar com a letra 't'")
         }
 
-        if (usuarioIdToDelete[0] !== "f") {
+        if (usuarioIdToDelete[0] !== "u") {
             res.status(400)
-            throw new Error("'usuarioId' deve iniciar com a letra 'f'")
+            throw new Error("'usuarioId' deve iniciar com a letra 'u'")
         }
 
         const [ tarefa ]: TarefaTipo[] | undefined[] = await db("tarefas").where({ id: tarefaIdToDelete })
