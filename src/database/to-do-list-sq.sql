@@ -49,7 +49,7 @@ SELECT * FROM usuarios_tarefas;
 SELECT * FROM tarefas
 LEFT JOIN usuarios_tarefas
 ON usuarios_tarefas.tarefa_id = tarefa_id
-INNER JOIN usuarios
+LEFT JOIN usuarios
 ON usuarios_tarefas.usuario_id = usuario_id;
 
 
