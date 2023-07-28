@@ -1,45 +1,56 @@
 -- Active: 1690320151409@@127.0.0.1@3306
-CREATE TABLE users (
+
+-- Criar tabelas 
+CREATE TABLE usuarios (
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
-    name TEXT NOT NULL,
+    nome TEXT NOT NULL,
 		email TEXT UNIQUE NOT NULL,
-		password TEXT NOT NULL
+		senha TEXT NOT NULL
 );
-
-CREATE TABLE tasks (
+CREATE TABLE tarefas  (
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
-    title TEXT NOT NULL,
-		description TEXT NOT NULL,
-		created_at TEXT DEFAULT (DATETIME()) NOT NULL,
-		status INTEGER DEFAULT (0) NOT NULL
+    titulo TEXT NOT NULL,
+		descricao TEXT NOT NULL,
+		criado_em TEXT DEFAULT (DATETIME()) NOT NULL,
+		 situação INTEGER DEFAULT (0) NOT NULL
+);
+CREATE TABLE usuarios_tarefas (
+		usuario_id TEXT NOT NULL,
+		tarefa_id TEXT NOT NULL,
+		FOREIGN KEY (usuario_id) REFERENCES usuarios (id),
+		FOREIGN KEY (tarefa_id) REFERENCES tarefas (id)
 );
 
-CREATE TABLE users_tasks (
-		user_id TEXT NOT NULL,
-		task_id TEXT NOT NULL,
-		FOREIGN KEY (user_id) REFERENCES users (id),
-		FOREIGN KEY (task_id) REFERENCES tasks (id)
-);
-
-INSERT INTO users (id, name, email, password)
+--popular tabelas para implementar os end-points
+INSERT INTO usuarios (id, nome, email, senha)
 VALUES
-	('f001', 'Fulano', 'fulano@email.com', 'fulano123'),
-	('f002', 'Beltrana', 'beltrana@email.com', 'beltrana00');
+	('usu001', 'Fulano', 'fulano@email.com', 'fulano123'),
+	('usu002', 'Beltrana', 'beltrana@email.com', 'beltrana00');
 
-INSERT INTO tasks (id, title, description)
+INSERT INTO tarefas (id, titulo, descricao)
 VALUES
-	('t001', 'Implementar o header', 'Criar o componente Header do site'),
-	('t002', 'Implementar o footer', 'Criar o componente Footer do site'),
-	('t003', 'Testar site', 'Teste de usabilidade de todo o site'),
-	('t004', 'Deploy do site', 'Subir o site no surge');
+	('tar001', 'Implementar o header', 'Criar o componente Header do site'),
+	('tar002', 'Implementar o footer', 'Criar o componente Footer do site'),
+	('tar003', 'Testar site', 'Teste de usabilidade de todo o site'),
+	('tar004', 'Deploy do site', 'Subir o site no surge');
 
-INSERT INTO users_tasks (user_id, task_id)
+INSERT INTO usuarios_tarefas (usuario_id, tarefa_id)
 VALUES
-	('f001', 't001'),
-	('f002', 't002'),
-	('f001', 't003'),
-	('f002', 't003');
+	('usu001', 'tar001'),
+	('usu002', 'tar002'),
+	('usu001', 'tar003'),
+	('usu002', 'tar003');
 
-SELECT * FROM users;
-SELECT * FROM tasks;
-SELECT * FROM users_tasks;
+
+-- Vizualizar tabelas
+SELECT * FROM usuarios;
+SELECT * FROM tarefas;
+SELECT * FROM usuarios_tarefas;
+SELECT * FROM tarefas
+LEFT JOIN usuarios_tarefas
+ON usuarios_tarefas.tarefa_id = tarefa_id
+INNER JOIN usuarios
+ON usuarios_tarefas.usuario_id = usuario_id;
+
+
+
