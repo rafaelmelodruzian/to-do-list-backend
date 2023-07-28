@@ -371,3 +371,146 @@ app.delete("/tarefas/:id", async (req: Request, res: Response) => {
     }
 })
 
+
+
+//Bloco tarefas atribuidas
+app.post("/tarefas/:tarefaId/usuarios/:usuarioId", async (req: Request, res: Response) => {
+    try {
+        const tarefaId = req.params.tarefaId
+        const usuarioId = req.params.usuarioId
+
+        if (tarefaId[0] !== "t") {
+            res.status(400)
+            throw new Error("'tarefaId' deve iniciar com a letra 't'")
+        }
+
+        if (usuarioId[0] !== "f") {
+            res.status(400)
+            throw new Error("'usuarioId' deve iniciar com a letra 'f'")
+        }
+
+        const [ tarefa ]: TarefaTipo[] | undefined[] = await db("tarefas").where({ id: tarefaId })
+
+        if (!tarefa) {
+            res.status(404)
+            throw new Error("'tarefaId' não encontrado")
+        }
+
+        const [ usuario ]: UsarioTipo[] | undefined[] = await db("usuarios").where({ id: usuarioId })
+
+        if (!usuario) {
+            res.status(404)
+            throw new Error("'usuarioId' não encontrado")
+        }
+
+        const newusuariotarefa: TarefaAtribuidaTipo = {
+            tarefa_id: tarefaId,
+            usuario_id: usuarioId
+        }
+
+        await db("usuarios_tarefas").insert(newusuariotarefa)
+
+        res.status(201).send({ message: "usuario atribuído à tarefa com sucesso" })
+
+    } catch (error) {
+        console.log(error)
+
+        if (req.statusCode === 200) {
+            res.status(500)
+        }
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+    }
+})
+app.delete("/tarefas/:tarefaId/usuarios/:usuarioId", async (req: Request, res: Response) => {
+    try {
+        const tarefaIdToDelete = req.params.tarefaId
+        const usuarioIdToDelete = req.params.usuarioId
+
+        if (tarefaIdToDelete[0] !== "t") {
+            res.status(400)
+            throw new Error("'tarefaId' deve iniciar com a letra 't'")
+        }
+
+        if (usuarioIdToDelete[0] !== "f") {
+            res.status(400)
+            throw new Error("'usuarioId' deve iniciar com a letra 'f'")
+        }
+
+        const [ tarefa ]: TarefaTipo[] | undefined[] = await db("tarefas").where({ id: tarefaIdToDelete })
+
+        if (!tarefa) {
+            res.status(404)
+            throw new Error("'tarefaId' não encontrado")
+        }
+
+        const [ usuario ]: UsarioTipo[] | undefined[] = await db("usuarios").where({ id: usuarioIdToDelete })
+
+        if (!usuario) {
+            res.status(404)
+            throw new Error("'usuarioId' não encontrado")
+        }
+
+        await db("usuarios_tarefas").del()
+            .where({ tarefa_id: tarefaIdToDelete })
+            .andWhere({ usuario_id: usuarioIdToDelete })
+
+        res.status(200).send({ message: "usuario removido da tarefa com sucesso" })
+
+    } catch (error) {
+        console.log(error)
+
+        if (req.statusCode === 200) {
+            res.status(500)
+        }
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+    }
+})
+app.get("/tarefas/usuarios", async (req: Request, res: Response) => {
+    try {
+        const tarefas: TarefaTipo[] = await db("tarefas")
+
+        const result: TarefaAtribuidaCompletaTipo[] = []
+
+        for (let tarefa of tarefas) {
+            const responsaveis = []
+            const usuarios_tarefas: TarefaAtribuidaTipo[] = await db("usuarios_tarefas").where({ tarefa_id: tarefa.id })
+            
+            for (let usuario_tarefa of usuarios_tarefas) {
+                const [ usuario ]: UsarioTipo[] = await db("usuarios").where({ id: usuario_tarefa.usuario_id })
+                responsaveis.push(usuario)
+            }
+
+            const newtarefaWithusuarios: TarefaAtribuidaCompletaTipo = {
+                ...tarefa,
+                responsaveis
+            }
+
+            result.push(newtarefaWithusuarios)
+        }
+
+        res.status(200).send(result)
+
+    } catch (error) {
+        console.log(error)
+
+        if (req.statusCode === 200) {
+            res.status(500)
+        }
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+    }
+})
